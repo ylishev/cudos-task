@@ -63,6 +63,9 @@ func (cc CudosCommand) RunSchedule(ctx context.Context, out chan<- string, inter
 					}
 
 					sentAmount, res, err := cc.cudos.Send(withdrawRewardAmount)
+					if checkErrWithChan(ctx, err, out) {
+						return
+					}
 					if !printWithChan(ctx, cc.formatSend(res, sentAmount), out) {
 						return
 					}
@@ -101,11 +104,11 @@ func printWithChan(ctx context.Context, msg string, outChan chan<- string) bool 
 }
 
 // formatWithdrawRewards calculate the total 'amount' of rewards
-func (cc CudosCommand) formatWithdrawRewards(res sdk.TxResponse, totalAmount sdk.Coin) string {
+func (cc CudosCommand) formatWithdrawRewards(res *sdk.TxResponse, totalAmount sdk.Coin) string {
 	return fmt.Sprintf("tx hash %s, gas used %d, withdraw rewards collected %v", res.TxHash, res.GasUsed, totalAmount)
 }
 
 // formatSend formats the sent 'amount'
-func (cc CudosCommand) formatSend(res sdk.TxResponse, totalAmount sdk.Coin) string {
+func (cc CudosCommand) formatSend(res *sdk.TxResponse, totalAmount sdk.Coin) string {
 	return fmt.Sprintf("tx hash %s, gas used %d, sent coins %v", res.TxHash, res.GasUsed, totalAmount)
 }

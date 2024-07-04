@@ -12,26 +12,30 @@ import (
 	"github.com/spf13/viper"
 )
 
+// InitRootCmd build and setup Cobra commands
 func InitRootCmd(ctx context.Context, vp *viper.Viper, runner CommandRunner) *cobra.Command {
 	var rootCmd = &cobra.Command{
-		Use:              "cudos-task",
-		Short:            "cudos-task is a CLI tool that provides command for automatically withdraw all rewards and send them to an address",
+		Use: "cudos-task",
+		Short: "cudos-task is a CLI tool that provides command for automatically withdraw " +
+			"all rewards and send them to an address",
 		RunE:             client.ValidateCmd,
 		TraverseChildren: true,
 	}
 
-	var cfgFile, node, chainId, keyringBackend, keyringDir, gasPrices, gas string
+	var cfgFile, node, chainID, keyringBackend, keyringDir, gasPrices, gas string
 	var gasAdjustment float64
 	var yes bool
 
 	// handle bootstrap the loading of the configuration file
 	cobra.OnInitialize(initConfig(&cfgFile, vp, rootCmd))
 
-	// define global flags
-	rootCmd.PersistentFlags().StringVar(&cfgFile, contract.ConfigFlagName, "", "config file (default is $HOME/.withdraw.yaml)")
+	// defines global flags
+	rootCmd.PersistentFlags().StringVar(&cfgFile, contract.ConfigFlagName, "",
+		"config file (default is $HOME/.withdraw.yaml)")
 	rootCmd.PersistentFlags().StringVar(&node, flags.FlagNode, contract.NodeAddressDefault, "cudos node")
-	rootCmd.PersistentFlags().StringVar(&chainId, flags.FlagChainID, contract.ChainIDDefault, "cudos chain id")
-	rootCmd.PersistentFlags().StringVar(&keyringBackend, flags.FlagKeyringBackend, contract.KeyringBackendDefault, "keyring backend")
+	rootCmd.PersistentFlags().StringVar(&chainID, flags.FlagChainID, contract.ChainIDDefault, "cudos chain id")
+	rootCmd.PersistentFlags().StringVar(&keyringBackend, flags.FlagKeyringBackend, contract.KeyringBackendDefault,
+		"keyring backend")
 	rootCmd.PersistentFlags().StringVar(&keyringDir, flags.FlagKeyringDir, "", "keyring dir (default is $PWD/)")
 	rootCmd.PersistentFlags().StringVar(&gasPrices, flags.FlagGasPrices, contract.GasPricesDefault, "gas prices")
 	rootCmd.PersistentFlags().Float64Var(&gasAdjustment, flags.FlagGasAdjustment, contract.GasAdjDefault, "gas adjustment")
@@ -77,7 +81,7 @@ func InitRootCmd(ctx context.Context, vp *viper.Viper, runner CommandRunner) *co
 		log.Fatalf("failed to bind flag: %v", err)
 	}
 
-	// define withdraw-rewards Cobra command and bridge to the business layer
+	// define withdraw-rewards Cobra command and bridge the command to the business layer
 	wrCmd, err := WithdrawRewardsCommandAttach(ctx, runner, vp)
 	if err != nil {
 		log.Fatalf("failed to attach withdraw send command: %v", err)

@@ -19,7 +19,8 @@ type WithdrawRewardsCommand struct {
 }
 
 // NewWithdrawRewardsCommand creates a new command and provides the dependencies
-func NewWithdrawRewardsCommand(ctx context.Context, vp *viper.Viper, shutdown contract.ShutdownReady, outChannel chan string) WithdrawRewardsCommand {
+func NewWithdrawRewardsCommand(ctx context.Context, vp *viper.Viper, shutdown contract.ShutdownReady,
+	outChannel chan string) WithdrawRewardsCommand {
 	return WithdrawRewardsCommand{
 		ctx:      ctx,
 		vp:       vp,
@@ -29,7 +30,7 @@ func NewWithdrawRewardsCommand(ctx context.Context, vp *viper.Viper, shutdown co
 }
 
 func (wc WithdrawRewardsCommand) Run(cmd *cobra.Command, _ []string) {
-	cudosWithdrawSender := cudos.NewCudosClient(cmd, wc.vp, wc.shutdown)
+	cudosWithdrawSender := cudos.NewClient(cmd, wc.vp, wc.shutdown)
 	cc := app.NewCudosCommand(wc.shutdown, cudosWithdrawSender)
 	cc.RunSchedule(wc.ctx, wc.out, wc.vp.GetDuration(contract.ScheduleIntervalFlagName))
 }

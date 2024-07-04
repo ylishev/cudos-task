@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -40,22 +39,23 @@ validators and sending them to an address.
 	var toAddress, from, memo string
 	var interval time.Duration
 	var reportBack bool
-	withdrawRewardsCmd.PersistentFlags().StringVar(&toAddress, contract.ToAddressFlagName, "", fmt.Sprintf("address to send the rewards"))
+	withdrawRewardsCmd.PersistentFlags().StringVar(&toAddress, contract.ToAddressFlagName, "",
+		"address to send the rewards")
 	err := withdrawRewardsCmd.MarkPersistentFlagRequired(contract.ToAddressFlagName)
 	if err != nil {
 		return nil, err
 	}
 
-	withdrawRewardsCmd.PersistentFlags().StringVar(&from, flags.FlagFrom, "", fmt.Sprintf("keyring from"))
+	withdrawRewardsCmd.PersistentFlags().StringVar(&from, flags.FlagFrom, "", "keyring from")
 	err = withdrawRewardsCmd.MarkPersistentFlagRequired(flags.FlagFrom)
 	if err != nil {
 		return nil, err
 	}
 
-	withdrawRewardsCmd.PersistentFlags().StringVar(&memo, flags.FlagNote, contract.NoteDefault, fmt.Sprintf("memo"))
+	withdrawRewardsCmd.PersistentFlags().StringVar(&memo, flags.FlagNote, contract.NoteDefault, "memo")
 
-	withdrawRewardsCmd.PersistentFlags().DurationVar(&interval, contract.ScheduleIntervalFlagName, contract.ScheduleIntervalDefault,
-		fmt.Sprintf("schedule interval duration"))
+	withdrawRewardsCmd.PersistentFlags().DurationVar(&interval, contract.ScheduleIntervalFlagName,
+		contract.ScheduleIntervalDefault, "schedule interval duration")
 
 	withdrawRewardsCmd.PersistentFlags().BoolVar(&reportBack, contract.ReportBackFlagName, false, "")
 	err = withdrawRewardsCmd.PersistentFlags().MarkHidden(contract.ReportBackFlagName)
@@ -75,7 +75,8 @@ validators and sending them to an address.
 	if err != nil {
 		return nil, err
 	}
-	err = vp.BindPFlag(contract.ScheduleIntervalFlagName, withdrawRewardsCmd.PersistentFlags().Lookup(contract.ScheduleIntervalFlagName))
+	err = vp.BindPFlag(contract.ScheduleIntervalFlagName, withdrawRewardsCmd.PersistentFlags().
+		Lookup(contract.ScheduleIntervalFlagName))
 	if err != nil {
 		return nil, err
 	}

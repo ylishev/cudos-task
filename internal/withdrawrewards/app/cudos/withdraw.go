@@ -10,14 +10,15 @@ import (
 	distribtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
-func (cc CudosClient) Withdraw() (sdk.Coin, sdk.TxResponse, error) {
+func (cc *Client) Withdraw() (sdk.Coin, *sdk.TxResponse, error) {
 	res := sdk.TxResponse{}
 	coin := sdk.Coin{}
 	delAddr := cc.clientCtx.GetFromAddress()
 	queryClient := distribtypes.NewQueryClient(cc.clientCtx)
-	delValsRes, err := queryClient.DelegatorValidators(cc.cobraCmd.Context(), &distribtypes.QueryDelegatorValidatorsRequest{DelegatorAddress: delAddr.String()})
+	delValsRes, err := queryClient.DelegatorValidators(cc.cobraCmd.Context(),
+		&distribtypes.QueryDelegatorValidatorsRequest{DelegatorAddress: delAddr.String()})
 	if err != nil {
-		return coin, res, fmt.Errorf("failed to obtain the staking validators: %v", err)
+		return coin, &res, fmt.Errorf("failed to obtain the staking validators: %v", err)
 	}
 
 	validators := delValsRes.Validators
@@ -26,12 +27,12 @@ func (cc CudosClient) Withdraw() (sdk.Coin, sdk.TxResponse, error) {
 	for _, valAddr := range validators {
 		val, err := sdk.ValAddressFromBech32(valAddr)
 		if err != nil {
-			return coin, res, fmt.Errorf("failed to check the validator address: %v", err)
+			return coin, &res, fmt.Errorf("failed to check the validator address: %v", err)
 		}
 
 		msg := distribtypes.NewMsgWithdrawDelegatorReward(delAddr, val)
 		if err := msg.ValidateBasic(); err != nil {
-			return coin, res, fmt.Errorf("failed to check the withdraw message: %v", err)
+			return coin, &res, fmt.Errorf("failed to check the withdraw message: %v", err)
 		}
 		msgs = append(msgs, msg)
 	}
@@ -42,7 +43,7 @@ func (cc CudosClient) Withdraw() (sdk.Coin, sdk.TxResponse, error) {
 
 	err = tx.GenerateOrBroadcastTxCLI(cc.clientCtx, cc.cobraCmd.Flags(), msgs...)
 	if err != nil {
-		return coin, res, fmt.Errorf("failed to broadcast withdraw rewards tx: %v", err)
+		return coin, &res, fmt.Errorf("failed to broadcast withdraw rewards tx: %v", err)
 	}
 
 	_ = cc.outWriter.Flush()
@@ -52,17 +53,17 @@ func (cc CudosClient) Withdraw() (sdk.Coin, sdk.TxResponse, error) {
 	cc.outBuffer.Reset()
 
 	if err != nil {
-		return coin, res, fmt.Errorf("failed to unmarshal the result of send tx: %v", err)
+		return coin, &res, fmt.Errorf("failed to unmarshal the result of send tx: %v", err)
 	}
 	if res.Code != 0 {
-		return coin, res, fmt.Errorf("widthdraw rewards tx faild: %s", res.RawLog)
+		return coin, &res, fmt.Errorf("widthdraw rewards tx faild: %s", res.RawLog)
 	}
 
-	return cc.CalculateWithdrawRewards(res), res, nil
+	return cc.CalculateWithdrawRewards(&res), &res, nil
 }
 
 // CalculateWithdrawRewards calculate the total 'amount' of rewards
-func (cc CudosClient) CalculateWithdrawRewards(res sdk.TxResponse) sdk.Coin {
+func (cc *Client) CalculateWithdrawRewards(res *sdk.TxResponse) sdk.Coin {
 	total := sdk.NewInt64Coin(contract.Denom, 0)
 	if res.Code != 0 {
 		return total
@@ -90,6 +91,6 @@ func (cc CudosClient) CalculateWithdrawRewards(res sdk.TxResponse) sdk.Coin {
 }
 
 // FormatWithdrawRewards calculate the total 'amount' of rewards
-func (cc CudosClient) FormatWithdrawRewards(res sdk.TxResponse, totalAmount sdk.Coin) string {
+func (cc *Client) FormatWithdrawRewards(res *sdk.TxResponse, totalAmount sdk.Coin) string {
 	return fmt.Sprintf("tx hash %s, gas used %d, withdraw rewards collected %v", res.TxHash, res.GasUsed, totalAmount)
 }

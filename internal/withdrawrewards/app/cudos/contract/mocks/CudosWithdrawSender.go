@@ -13,7 +13,7 @@ type CudosWithdrawSender struct {
 }
 
 // Send provides a mock function with given fields: amount
-func (_m *CudosWithdrawSender) Send(amount types.Coin) (types.Coin, types.TxResponse, error) {
+func (_m *CudosWithdrawSender) Send(amount types.Coin) (types.Coin, *types.TxResponse, error) {
 	ret := _m.Called(amount)
 
 	if len(ret) == 0 {
@@ -21,9 +21,9 @@ func (_m *CudosWithdrawSender) Send(amount types.Coin) (types.Coin, types.TxResp
 	}
 
 	var r0 types.Coin
-	var r1 types.TxResponse
+	var r1 *types.TxResponse
 	var r2 error
-	if rf, ok := ret.Get(0).(func(types.Coin) (types.Coin, types.TxResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(types.Coin) (types.Coin, *types.TxResponse, error)); ok {
 		return rf(amount)
 	}
 	if rf, ok := ret.Get(0).(func(types.Coin) types.Coin); ok {
@@ -32,10 +32,12 @@ func (_m *CudosWithdrawSender) Send(amount types.Coin) (types.Coin, types.TxResp
 		r0 = ret.Get(0).(types.Coin)
 	}
 
-	if rf, ok := ret.Get(1).(func(types.Coin) types.TxResponse); ok {
+	if rf, ok := ret.Get(1).(func(types.Coin) *types.TxResponse); ok {
 		r1 = rf(amount)
 	} else {
-		r1 = ret.Get(1).(types.TxResponse)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*types.TxResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(2).(func(types.Coin) error); ok {
@@ -48,7 +50,7 @@ func (_m *CudosWithdrawSender) Send(amount types.Coin) (types.Coin, types.TxResp
 }
 
 // Withdraw provides a mock function with given fields:
-func (_m *CudosWithdrawSender) Withdraw() (types.Coin, types.TxResponse, error) {
+func (_m *CudosWithdrawSender) Withdraw() (types.Coin, *types.TxResponse, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
@@ -56,9 +58,9 @@ func (_m *CudosWithdrawSender) Withdraw() (types.Coin, types.TxResponse, error) 
 	}
 
 	var r0 types.Coin
-	var r1 types.TxResponse
+	var r1 *types.TxResponse
 	var r2 error
-	if rf, ok := ret.Get(0).(func() (types.Coin, types.TxResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func() (types.Coin, *types.TxResponse, error)); ok {
 		return rf()
 	}
 	if rf, ok := ret.Get(0).(func() types.Coin); ok {
@@ -67,10 +69,12 @@ func (_m *CudosWithdrawSender) Withdraw() (types.Coin, types.TxResponse, error) 
 		r0 = ret.Get(0).(types.Coin)
 	}
 
-	if rf, ok := ret.Get(1).(func() types.TxResponse); ok {
+	if rf, ok := ret.Get(1).(func() *types.TxResponse); ok {
 		r1 = rf()
 	} else {
-		r1 = ret.Get(1).(types.TxResponse)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*types.TxResponse)
+		}
 	}
 
 	if rf, ok := ret.Get(2).(func() error); ok {

@@ -10,13 +10,13 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
-func (cc CudosClient) Send(amount sdk.Coin) (sdk.Coin, sdk.TxResponse, error) {
+func (cc *Client) Send(amount sdk.Coin) (sdk.Coin, *sdk.TxResponse, error) {
 	res := sdk.TxResponse{}
 	coin := sdk.Coin{}
 
 	toAddress, err := sdk.AccAddressFromBech32(cc.vp.GetString(contract.ToAddressFlagName))
 	if err != nil {
-		return coin, res, fmt.Errorf("failed to obtain the to-address: %v", err)
+		return coin, &res, fmt.Errorf("failed to obtain the to-address: %v", err)
 	}
 
 	msg := &banktypes.MsgSend{
@@ -25,7 +25,7 @@ func (cc CudosClient) Send(amount sdk.Coin) (sdk.Coin, sdk.TxResponse, error) {
 		Amount:      sdk.NewCoins(amount),
 	}
 	if err := msg.ValidateBasic(); err != nil {
-		return coin, res, fmt.Errorf("failed to parse the amount to send: %v", err)
+		return coin, &res, fmt.Errorf("failed to parse the amount to send: %v", err)
 	}
 
 	// clean the buffer for future use
@@ -34,31 +34,31 @@ func (cc CudosClient) Send(amount sdk.Coin) (sdk.Coin, sdk.TxResponse, error) {
 	err = tx.GenerateOrBroadcastTxCLI(cc.clientCtx, cc.cobraCmd.Flags(), msg)
 
 	if err != nil {
-		return coin, res, fmt.Errorf("failed to broadcast send tx: %v", err)
+		return coin, &res, fmt.Errorf("failed to broadcast send tx: %v", err)
 	}
 
 	_ = cc.outWriter.Flush()
 	err = cc.clientCtx.Codec.UnmarshalJSON(cc.outBuffer.Bytes(), &res)
 	if err != nil {
-		return coin, res, fmt.Errorf("failed to unmarshal the result of send tx: %v", err)
+		return coin, &res, fmt.Errorf("failed to unmarshal the result of send tx: %v", err)
 	}
 
 	// clean the buffer for future use
 	cc.outBuffer.Reset()
 	if res.Code != 0 {
-		return coin, res, fmt.Errorf("send tx faild: %s", res.RawLog)
+		return coin, &res, fmt.Errorf("send tx faild: %s", res.RawLog)
 	}
 
-	return cc.CalculateSentAmount(res, toAddress), res, nil
+	return cc.CalculateSentAmount(&res, toAddress), &res, nil
 }
 
 // FormatSend formats the sent 'amount'
-func (cc CudosClient) FormatSend(res sdk.TxResponse, totalAmount sdk.Coin) string {
+func (cc *Client) FormatSend(res *sdk.TxResponse, totalAmount sdk.Coin) string {
 	return fmt.Sprintf("tx hash %s, gas used %d, sent coins %v", res.TxHash, res.GasUsed, totalAmount)
 }
 
 // CalculateSentAmount calculate the total 'amount' of sent coins
-func (cc CudosClient) CalculateSentAmount(res sdk.TxResponse, to sdk.AccAddress) sdk.Coin {
+func (cc *Client) CalculateSentAmount(res *sdk.TxResponse, to sdk.AccAddress) sdk.Coin {
 	total := sdk.NewInt64Coin(contract.Denom, 0)
 	if res.Code != 0 {
 		return total

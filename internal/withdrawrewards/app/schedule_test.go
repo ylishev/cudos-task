@@ -107,13 +107,13 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 
 			var err error
 			amount := types.NewInt64Coin(contract.Denom, 0)
-			if len(tt.fields.withdrawRewardAmount) > 0 {
+			if tt.fields.withdrawRewardAmount != "" {
 				amount, err = types.ParseCoinNormalized(tt.fields.withdrawRewardAmount)
 				require.Nil(t, err)
 			}
 
-			cudosWithdrawSender.On("Withdraw").Return(amount, resWithdraw, tt.fields.withdrawErr)
-			cudosWithdrawSender.On("Send", mock.AnythingOfType("types.Coin")).Return(amount, resSend, tt.fields.sendErr)
+			cudosWithdrawSender.On("Withdraw").Return(amount, &resWithdraw, tt.fields.withdrawErr)
+			cudosWithdrawSender.On("Send", mock.AnythingOfType("types.Coin")).Return(amount, &resSend, tt.fields.sendErr)
 
 			shutdown := new(contractmocks.ShutdownReady)
 			shutdown.On("SetReady", mock.Anything).Return(true)
@@ -161,14 +161,14 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 	}
 }
 
-func TestCudosCommand_RunSchedule_AndCloseContext(t *testing.T) {
+func TestCudosCommand_RunSchedule_AndCloseContext(_ *testing.T) {
 	cudosWithdrawSender := new(apimocks.CudosWithdrawSender)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	shutdown := new(contractmocks.ShutdownReady)
-	shutdown.On("SetReady", mock.Anything).Return(true).Run(func(args mock.Arguments) {
+	shutdown.On("SetReady", mock.Anything).Return(true).Run(func(_ mock.Arguments) {
 		// cancel the context after first call of SetReady
 		cancel()
 	})

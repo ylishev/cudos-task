@@ -62,7 +62,7 @@ func TestCudosTaskCommand(t *testing.T) {
 				if !tt.fails {
 					assert.FailNow(t, "unexpected error executing command")
 				}
-				assert.Contains(t, string(err.Error()), tt.want)
+				assert.Contains(t, err.Error(), tt.want)
 				return
 			}
 			require.NotNil(t, executedCMD, "cobra command should not be nil")

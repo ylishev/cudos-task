@@ -13,14 +13,13 @@ func initConfig(cfgFile *string, vp *viper.Viper, rootCmd *cobra.Command) func()
 	return func() {
 		flagSet := rootCmd.PersistentFlags()
 		if *cfgFile != "" {
-			// Use config file from the flag.
+			// use config file from the flag
 			vp.SetConfigFile(*cfgFile)
 		} else {
-			// Find home directory.
 			home, err := os.UserHomeDir()
 			cobra.CheckErr(err)
 
-			// Search config in home directory with name ".withdraw"
+			// search config in home directory with name ".withdraw"
 			vp.AddConfigPath(home)
 			vp.SetConfigName(".withdraw")
 			vp.SetConfigType("yaml")
@@ -29,9 +28,10 @@ func initConfig(cfgFile *string, vp *viper.Viper, rootCmd *cobra.Command) func()
 		vp.AutomaticEnv()
 
 		if err := vp.ReadInConfig(); err == nil {
-			_, _ = rootCmd.OutOrStdout().Write([]byte(fmt.Sprintf("using config file:%s\n", vp.ConfigFileUsed())))
+			_, _ = fmt.Fprintf(rootCmd.OutOrStdout(), "using config file:%s\n", vp.ConfigFileUsed())
 		}
 
+		// figure out the default keyring directory
 		if vp.GetString(flags.FlagKeyringDir) == "" {
 			pwd, err := os.Getwd()
 			if err == nil {

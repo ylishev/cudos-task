@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type CudosClient struct {
+type Client struct {
 	cobraCmd  *cobra.Command
 	shutdown  contract.ShutdownReady
 	clientCtx client.Context
@@ -31,8 +31,8 @@ type CudosClient struct {
 	vp        *viper.Viper
 }
 
-func NewCudosClient(cc *cobra.Command, vp *viper.Viper, shutdown contract.ShutdownReady) *CudosClient {
-	cmd := CudosClient{
+func NewClient(cc *cobra.Command, vp *viper.Viper, shutdown contract.ShutdownReady) *Client {
+	cmd := Client{
 		cobraCmd: cc,
 		shutdown: shutdown,
 		vp:       vp,
@@ -64,7 +64,6 @@ func NewCudosClient(cc *cobra.Command, vp *viper.Viper, shutdown contract.Shutdo
 
 	clientCtx = clientCtx.
 		WithCodec(marshaler).
-		WithJSONCodec(marshaler).
 		WithInterfaceRegistry(interfaceRegistry).
 		WithTxConfig(txConfig).
 		WithLegacyAmino(aminoCodec).
@@ -78,6 +77,6 @@ func NewCudosClient(cc *cobra.Command, vp *viper.Viper, shutdown contract.Shutdo
 	return &cmd
 }
 
-func (cc CudosClient) Context() client.Context {
+func (cc *Client) Context() client.Context {
 	return cc.clientCtx
 }
