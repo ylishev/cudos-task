@@ -7,17 +7,17 @@ import (
 	"time"
 
 	"cudos-task/contract"
-	"cudos-task/internal/withdrawrewards/app/cudos/api"
+	cudoscontract "cudos-task/internal/withdrawrewards/app/cudos/contract"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type CudosCommand struct {
 	shutdown contract.ShutdownReady
-	cudos    api.CudosWithdrawSender
+	cudos    cudoscontract.CudosWithdrawSender
 }
 
-func NewCudosCommand(shutdown contract.ShutdownReady, cudos api.CudosWithdrawSender) *CudosCommand {
+func NewCudosCommand(shutdown contract.ShutdownReady, cudos cudoscontract.CudosWithdrawSender) *CudosCommand {
 	cmd := CudosCommand{
 		shutdown: shutdown,
 		cudos:    cudos,

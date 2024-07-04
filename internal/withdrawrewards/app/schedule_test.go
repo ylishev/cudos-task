@@ -8,13 +8,14 @@ import (
 
 	"cudos-task/contract"
 	contractmocks "cudos-task/contract/mocks"
-	apimocks "cudos-task/internal/withdrawrewards/app/cudos/api/mocks"
+	apimocks "cudos-task/internal/withdrawrewards/app/cudos/contract/mocks"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCudosCommand_RunSchedule(t *testing.T) {
@@ -95,20 +96,20 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 			resWithdraw := types.TxResponse{}
 			if tt.expects.withdrawOk {
 				err := marshaller.UnmarshalJSON([]byte(tt.fields.withdraw), &resWithdraw)
-				assert.Nil(t, err)
+				require.Nil(t, err)
 			}
 
 			resSend := types.TxResponse{}
 			if tt.expects.sendOk {
 				err := marshaller.UnmarshalJSON([]byte(tt.fields.send), &resSend)
-				assert.Nil(t, err)
+				require.Nil(t, err)
 			}
 
 			var err error
 			amount := types.NewInt64Coin(contract.Denom, 0)
 			if len(tt.fields.withdrawRewardAmount) > 0 {
 				amount, err = types.ParseCoinNormalized(tt.fields.withdrawRewardAmount)
-				assert.Nil(t, err)
+				require.Nil(t, err)
 			}
 
 			cudosWithdrawSender.On("Withdraw").Return(amount, resWithdraw, tt.fields.withdrawErr)

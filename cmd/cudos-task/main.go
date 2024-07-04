@@ -7,6 +7,7 @@ import (
 	"cudos-task/cmd/cudos-task/cmd"
 	"cudos-task/contract"
 	"cudos-task/internal/shutdown"
+	appcmd "cudos-task/internal/withdrawrewards/cmd"
 
 	"github.com/spf13/viper"
 )
@@ -21,7 +22,8 @@ func main() {
 	shutdownReady := shutdown.NewShutdown(cancel)
 
 	// build and run Cobra commands
-	rootCmd := cmd.InitRootCmd(ctx, vp, shutdownReady, outChannel)
+	withdrawAwardsCmd := appcmd.NewWithdrawRewardsCommand(ctx, vp, shutdownReady, outChannel)
+	rootCmd := cmd.InitRootCmd(ctx, vp, withdrawAwardsCmd)
 	executedCMD, err := rootCmd.ExecuteC()
 	if err != nil {
 		log.Printf("error executing command: %v\nUse --help for details\n", err)

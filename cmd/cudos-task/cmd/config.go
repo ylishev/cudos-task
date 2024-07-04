@@ -6,12 +6,12 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
-func initConfig(cfgFile *string, vp *viper.Viper, flagSet *pflag.FlagSet) func() {
+func initConfig(cfgFile *string, vp *viper.Viper, rootCmd *cobra.Command) func() {
 	return func() {
+		flagSet := rootCmd.PersistentFlags()
 		if *cfgFile != "" {
 			// Use config file from the flag.
 			vp.SetConfigFile(*cfgFile)
@@ -29,7 +29,7 @@ func initConfig(cfgFile *string, vp *viper.Viper, flagSet *pflag.FlagSet) func()
 		vp.AutomaticEnv()
 
 		if err := vp.ReadInConfig(); err == nil {
-			fmt.Println("using config file:", vp.ConfigFileUsed())
+			_, _ = rootCmd.OutOrStdout().Write([]byte(fmt.Sprintf("using config file:%s\n", vp.ConfigFileUsed())))
 		}
 
 		if vp.GetString(flags.FlagKeyringDir) == "" {

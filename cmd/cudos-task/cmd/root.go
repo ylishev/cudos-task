@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"cudos-task/contract"
-	"cudos-task/internal/withdrawrewards/cmd"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -13,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func InitRootCmd(ctx context.Context, vp *viper.Viper, shutdown contract.ShutdownReady, outChannel chan string) *cobra.Command {
+func InitRootCmd(ctx context.Context, vp *viper.Viper, runner CommandRunner) *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:              "cudos-task",
 		Short:            "cudos-task is a CLI tool that provides command for automatically withdraw all rewards and send them to an address",
@@ -26,7 +25,7 @@ func InitRootCmd(ctx context.Context, vp *viper.Viper, shutdown contract.Shutdow
 	var yes bool
 
 	// handle bootstrap the loading of the configuration file
-	cobra.OnInitialize(initConfig(&cfgFile, vp, rootCmd.PersistentFlags()))
+	cobra.OnInitialize(initConfig(&cfgFile, vp, rootCmd))
 
 	// define global flags
 	rootCmd.PersistentFlags().StringVar(&cfgFile, contract.ConfigFlagName, "", "config file (default is $HOME/.withdraw.yaml)")
@@ -79,7 +78,7 @@ func InitRootCmd(ctx context.Context, vp *viper.Viper, shutdown contract.Shutdow
 	}
 
 	// define withdraw-rewards Cobra command and bridge to the business layer
-	wrCmd, err := WithdrawRewardsCommandAttach(ctx, cmd.NewWithdrawRewardsCommand(ctx, vp, shutdown, outChannel), vp)
+	wrCmd, err := WithdrawRewardsCommandAttach(ctx, runner, vp)
 	if err != nil {
 		log.Fatalf("failed to attach withdraw send command: %v", err)
 	}

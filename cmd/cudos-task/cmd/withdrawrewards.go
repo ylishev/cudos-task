@@ -22,7 +22,7 @@ type CommandRunner interface {
 // from business layer by using CommandRunner interface
 func WithdrawRewardsCommandAttach(ctx context.Context, runner CommandRunner, vp *viper.Viper) (*cobra.Command, error) {
 	withdrawRewardsCmd := &cobra.Command{
-		Use:   "withdraw-rewards",
+		Use:   contract.WithdrawRewardsCmdName,
 		Short: "withdraw-rewards is a command for automatically withdraw all rewards and send to an address",
 		Long: `
 withdraw-rewards is a command for automatically collecting

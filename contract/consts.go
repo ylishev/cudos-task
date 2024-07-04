@@ -21,6 +21,7 @@ const (
 	SkipConfirmDefault      = true
 	ScheduleIntervalDefault = 5 * time.Minute
 	ShutdownMaxWaitTime     = 15 * time.Minute
+	WithdrawRewardsCmdName  = "withdraw-rewards"
 )
 
 const (
