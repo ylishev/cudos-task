@@ -9,6 +9,7 @@ import (
 )
 
 // init function to shut down std err writes, done by cosmos sdk, without using logger functions
+// nolint:gochecknoinits // workaround, see previous line
 func init() {
 	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0755)
 	if err != nil {
@@ -17,7 +18,7 @@ func init() {
 	os.Stderr = devNull
 }
 
-var (
+const (
 	AccountPubKeyPrefix    = contract.AccountAddressPrefix + "pub"
 	ValidatorAddressPrefix = contract.AccountAddressPrefix + "valoper"
 	ValidatorPubKeyPrefix  = contract.AccountAddressPrefix + "valoperpub"

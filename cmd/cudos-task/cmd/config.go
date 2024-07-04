@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
@@ -26,6 +27,7 @@ func initConfig(cfgFile *string, vp *viper.Viper, rootCmd *cobra.Command) func()
 		}
 
 		vp.AutomaticEnv()
+		vp.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 		if err := vp.ReadInConfig(); err == nil {
 			_, _ = fmt.Fprintf(rootCmd.OutOrStdout(), "using config file:%s\n", vp.ConfigFileUsed())
