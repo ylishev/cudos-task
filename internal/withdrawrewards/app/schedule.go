@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -80,7 +81,6 @@ func checkErrWithChan(ctx context.Context, err error, errChan chan<- string) boo
 	if err != nil {
 		select {
 		case <-ctx.Done():
-			break
 		case errChan <- err.Error():
 		}
 		return true
@@ -93,6 +93,9 @@ func printWithChan(ctx context.Context, msg string, outChan chan<- string) bool 
 	case <-ctx.Done():
 		return false
 	case outChan <- msg:
+		if errors.Is(ctx.Err(), context.Canceled) {
+			return false
+		}
 	}
 	return true
 }

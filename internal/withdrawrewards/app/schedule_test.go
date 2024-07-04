@@ -3,13 +3,11 @@ package app
 import (
 	"context"
 	"errors"
-	"reflect"
 	"testing"
 	"time"
 
 	"cudos-task/contract"
 	contractmocks "cudos-task/contract/mocks"
-	"cudos-task/internal/withdrawrewards/app/cudos/api"
 	apimocks "cudos-task/internal/withdrawrewards/app/cudos/api/mocks"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -58,7 +56,7 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 			},
 		},
 		{
-			name: "withdraws rewards and then send them successfully",
+			name: "withdraws rewards with insufficient fees and fails",
 			fields: fields{
 				withdrawRewardAmount: "",
 				withdraw:             `{"height":"0","txhash":"272DAAADCC886944AC75ABDB18185D59C5E4451EFFC052300F509C608CAF7C5A","codespace":"sdk","code":13,"data":"","raw_log":"insufficient fees; got: 37434500000000000acudos required: 374345000000000000acudos: insufficient fee","logs":[],"info":"","gas_wanted":"74869","gas_used":"0","tx":null,"timestamp":"","events":[]}`,
@@ -71,6 +69,22 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 				withdrawContains: "widthdraw rewards tx faild: insufficient fees; got: 37434500000000000acudos",
 				sendOk:           false,
 				sendContains:     "sent coins",
+			},
+		},
+		{
+			name: "run withdraw then close the context and fails",
+			fields: fields{
+				withdrawRewardAmount: "",
+				withdraw:             ``,
+				withdrawErr:          nil,
+				send:                 ``,
+				sendErr:              nil,
+			},
+			expects: expects{
+				withdrawOk:       false,
+				withdrawContains: "",
+				sendOk:           false,
+				sendContains:     "",
 			},
 		},
 	}
@@ -106,8 +120,9 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 			ccx := NewCudosCommand(shutdown, cudosWithdrawSender)
 
 			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
 			out := make(chan string, 20)
-			interval := 500 * time.Millisecond
+			interval := time.Second
 			ccx.RunSchedule(ctx, out, interval)
 
 			var withdrawMsg, sendMsg string
@@ -145,23 +160,29 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 	}
 }
 
-func TestNewCudosCommand(t *testing.T) {
-	type args struct {
-		shutdown contract.ShutdownReady
-		cudos    api.CudosWithdrawSender
-	}
-	tests := []struct {
-		name string
-		args args
-		want *CudosCommand
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewCudosCommand(tt.args.shutdown, tt.args.cudos); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewCudosCommand() = %v, want %v", got, tt.want)
-			}
-		})
+func TestCudosCommand_RunSchedule_AndCloseContext(t *testing.T) {
+	cudosWithdrawSender := new(apimocks.CudosWithdrawSender)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	shutdown := new(contractmocks.ShutdownReady)
+	shutdown.On("SetReady", mock.Anything).Return(true).Run(func(args mock.Arguments) {
+		// cancel the context after first call of SetReady
+		cancel()
+	})
+
+	// Withdraw shouldn't be called at all in this test
+	cudosWithdrawSender.On("Withdraw").Times(0)
+
+	ccx := NewCudosCommand(shutdown, cudosWithdrawSender)
+
+	out := make(chan string, 20)
+	interval := 100 * time.Millisecond
+	ccx.RunSchedule(ctx, out, interval)
+
+	select {
+	case <-out:
+	case <-time.After(500 * time.Millisecond):
 	}
 }
