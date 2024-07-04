@@ -31,7 +31,7 @@ docker buildx build --platform linux/arm64 -f test-cudos-task.dockerfile -t test
 docker run -it --rm --platform linux/arm64 --name testing-cudos-task-container testing-cudos-task
 ```
 
-Running only the linter (again, recommended with the proper --platform option) might be done locally, in tool's source directory:
+Running only the linter (again, recommended with the proper --platform option) might be done locally, in the tool's source directory:
 ```bash
 docker run --rm --platform linux/arm64 -v $(pwd):/app -w /app golangci/golangci-lint:v1.59.1 golangci-lint run ./...
 ```
@@ -56,5 +56,5 @@ In my case, keyring-dir is located inside cudos-node tool at:
 That is the reason why <b>--keyring-dir</b> is pointing at <b>/cudos-data</b> location.
 </pre>
 
-Aside from the note above, **--from**, **--to-address** and **interval** flags could be tweaked.
-**interval** (duration syntax, i.e. 30s, 2m, etc) is used to run the schedule.
+Aside from the note above, **--from**, **--to-address** and **--interval** flags could be tweaked.
+**--interval** (duration syntax, i.e. 30s, 2m, etc.) is used to run the schedule.
