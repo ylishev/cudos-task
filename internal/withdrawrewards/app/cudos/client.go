@@ -31,6 +31,7 @@ type Client struct {
 	vp        *viper.Viper
 }
 
+// NewClient setups Cosmos SDK pre-requirements for withdraw/send commands
 func NewClient(cc *cobra.Command, vp *viper.Viper, shutdown contract.ShutdownReady) *Client {
 	cmd := Client{
 		cobraCmd: cc,
@@ -43,8 +44,8 @@ func NewClient(cc *cobra.Command, vp *viper.Viper, shutdown contract.ShutdownRea
 
 	aminoCodec := codec.NewLegacyAmino()
 	interfaceRegistry := codectypes.NewInterfaceRegistry()
-	marshaler := codec.NewProtoCodec(interfaceRegistry)
-	txConfig := authtx.NewTxConfig(marshaler, authtx.DefaultSignModes)
+	marshaller := codec.NewProtoCodec(interfaceRegistry)
+	txConfig := authtx.NewTxConfig(marshaller, authtx.DefaultSignModes)
 
 	std.RegisterLegacyAminoCodec(aminoCodec)
 	std.RegisterInterfaces(interfaceRegistry)
@@ -63,7 +64,7 @@ func NewClient(cc *cobra.Command, vp *viper.Viper, shutdown contract.ShutdownRea
 	clientCtx.Viper = vp
 
 	clientCtx = clientCtx.
-		WithCodec(marshaler).
+		WithCodec(marshaller).
 		WithInterfaceRegistry(interfaceRegistry).
 		WithTxConfig(txConfig).
 		WithLegacyAmino(aminoCodec).

@@ -34,6 +34,8 @@ func NewShutdown(cancel context.CancelFunc) *Shutdown {
 	return sh
 }
 
+// SetReady allows to define a safety block between SetReady(false) and SetReady(true)
+// between which the application can shut down gracefully
 func (s *Shutdown) SetReady(ready bool) bool {
 	if ready {
 		if s.ready.CompareAndSwap(1, 0) {

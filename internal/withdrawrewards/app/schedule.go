@@ -53,15 +53,18 @@ func (cc CudosCommand) RunSchedule(ctx context.Context, out chan<- string, inter
 						return
 					}
 
+					// don't try to broadcast send tx with zero amount
 					if withdrawRewardAmount.IsZero() {
 						return
 					}
 
-					// decouple domain-specific types (from Cosmos SDK) to prevent leaking those types to the outside layer
+					// decouple domain-specific (Cosmos SDK) types to prevent leaking those to the outside layer
+					// by generating a human-like reporting message
 					if !printWithChan(ctx, cc.formatWithdrawRewards(res, withdrawRewardAmount), out) {
 						return
 					}
 
+					// send the withdrawn reward (caveat: tx fees + gas >> withdrawn reward which makes no financial sense)
 					sentAmount, res, err := cc.cudos.Send(withdrawRewardAmount)
 					if checkErrWithChan(ctx, err, out) {
 						return

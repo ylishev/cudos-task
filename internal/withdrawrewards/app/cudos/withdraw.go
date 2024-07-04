@@ -62,7 +62,7 @@ func (cc *Client) Withdraw() (sdk.Coin, *sdk.TxResponse, error) {
 	return cc.CalculateWithdrawRewards(&res), &res, nil
 }
 
-// CalculateWithdrawRewards calculate the total 'amount' of rewards
+// CalculateWithdrawRewards calculate the total withdrawn reward amount
 func (cc *Client) CalculateWithdrawRewards(res *sdk.TxResponse) sdk.Coin {
 	total := sdk.NewInt64Coin(contract.Denom, 0)
 	if res.Code != 0 {
@@ -90,7 +90,7 @@ func (cc *Client) CalculateWithdrawRewards(res *sdk.TxResponse) sdk.Coin {
 	return total
 }
 
-// FormatWithdrawRewards calculate the total 'amount' of rewards
+// FormatWithdrawRewards formats the total withdrawn reward amount
 func (cc *Client) FormatWithdrawRewards(res *sdk.TxResponse, totalAmount sdk.Coin) string {
 	return fmt.Sprintf("tx hash %s, gas used %d, withdraw rewards collected %v", res.TxHash, res.GasUsed, totalAmount)
 }
