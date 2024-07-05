@@ -37,10 +37,21 @@ docker run --rm --platform linux/arm64 -v $(pwd):/app -w /app golangci/golangci-
 ```
 
 ## Tool usage
+
+On testnet:
 ```bash
 docker run -it --rm -v /Users/yuliyan/cudos-node/cudos-data:/cudos-data \
 --name cudos-task-container cudos-task withdraw-rewards --node https://rpc.testnet.cudos.org:443 \
 --keyring-dir /cudos-data --chain-id cudos-testnet-public-4 \
+--from test --to-address cudos1fefgllqh9qpjn3laz3lmhl68kvlfhwzmq6clfq \
+--interval 30s
+```
+
+On mainnet:
+```bash
+docker run -it --rm -v /Users/yuliyan/cudos-node/cudos-data:/cudos-data \
+--name cudos-task-container cudos-task withdraw-rewards --node https://rpc.cudos.org:443 \
+--keyring-dir /cudos-data --chain-id cudos-1 \
 --from test --to-address cudos1fefgllqh9qpjn3laz3lmhl68kvlfhwzmq6clfq \
 --interval 30s
 ```
