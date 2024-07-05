@@ -91,7 +91,7 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cudosWithdrawSender := new(apimocks.CudosWithdrawSender)
+			withdrawSender := new(apimocks.CudosWithdrawSender)
 
 			resWithdraw := types.TxResponse{}
 			if tt.expects.withdrawOk {
@@ -112,13 +112,13 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 				require.Nil(t, err)
 			}
 
-			cudosWithdrawSender.On("Withdraw").Return(amount, &resWithdraw, tt.fields.withdrawErr)
-			cudosWithdrawSender.On("Send", mock.AnythingOfType("types.Coin")).Return(amount, &resSend, tt.fields.sendErr)
+			withdrawSender.On("Withdraw").Return(amount, &resWithdraw, tt.fields.withdrawErr)
+			withdrawSender.On("Send", mock.AnythingOfType("types.Coin")).Return(amount, &resSend, tt.fields.sendErr)
 
 			shutdown := new(contractmocks.ShutdownReady)
 			shutdown.On("SetReady", mock.Anything).Return(true)
 
-			ccx := NewCudosCommand(shutdown, cudosWithdrawSender)
+			ccx := NewCudosCommand(shutdown, withdrawSender)
 
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -162,7 +162,7 @@ func TestCudosCommand_RunSchedule(t *testing.T) {
 }
 
 func TestCudosCommand_RunSchedule_AndCloseContext(_ *testing.T) {
-	cudosWithdrawSender := new(apimocks.CudosWithdrawSender)
+	withdrawSender := new(apimocks.CudosWithdrawSender)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -174,9 +174,9 @@ func TestCudosCommand_RunSchedule_AndCloseContext(_ *testing.T) {
 	})
 
 	// Withdraw shouldn't be called at all in this test
-	cudosWithdrawSender.On("Withdraw").Times(0)
+	withdrawSender.On("Withdraw").Times(0)
 
-	ccx := NewCudosCommand(shutdown, cudosWithdrawSender)
+	ccx := NewCudosCommand(shutdown, withdrawSender)
 
 	out := make(chan string, 20)
 	interval := 100 * time.Millisecond

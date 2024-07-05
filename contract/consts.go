@@ -20,7 +20,7 @@ const (
 	KeyringBackendDefault   = keyring.BackendTest
 	SkipConfirmDefault      = true
 	ScheduleIntervalDefault = 5 * time.Minute
-	ShutdownMaxWaitTime     = 15 * time.Minute
+	ShutdownMaxWaitTime     = time.Minute
 	WithdrawRewardsCmdName  = "withdraw-rewards"
 )
 

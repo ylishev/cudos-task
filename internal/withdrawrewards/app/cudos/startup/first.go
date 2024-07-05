@@ -9,6 +9,7 @@ import (
 )
 
 // init function to shut down std err writes, done by cosmos sdk, without using logger functions
+// see go/pkg/mod/github.com/cosmos/cosmos-sdk@v0.45.16/client/tx/tx.go:101
 // nolint:gochecknoinits // workaround, see previous line
 func init() {
 	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0755)

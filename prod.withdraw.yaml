@@ -1,6 +1,6 @@
-node: https://rpc.testnet.cudos.org:443
-chain-id: cudos-testnet-public-4
+node: https://rpc.cudos.org:443
+chain-id: cudos-1
 # defines the scheduling interval that withdraw-rewards will be executed
-interval: 30s
+interval: 60s
 # path to keyring-dir of cudos-node in order to access keys stored for the test backend
 keyring-dir: /Users/yuliyan/cudos-node/cudos-data

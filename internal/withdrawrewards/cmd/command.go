@@ -30,7 +30,7 @@ func NewWithdrawRewardsCommand(ctx context.Context, vp *viper.Viper, shutdown co
 }
 
 func (wc WithdrawRewardsCommand) Run(cmd *cobra.Command, _ []string) {
-	cudosWithdrawSender := cudos.NewClient(cmd, wc.vp, wc.shutdown)
-	cc := app.NewCudosCommand(wc.shutdown, cudosWithdrawSender)
+	withdrawSender := cudos.NewClient(cmd, wc.vp, wc.shutdown)
+	cc := app.NewCudosCommand(wc.shutdown, withdrawSender)
 	cc.RunSchedule(wc.ctx, wc.out, wc.vp.GetDuration(contract.ScheduleIntervalFlagName))
 }

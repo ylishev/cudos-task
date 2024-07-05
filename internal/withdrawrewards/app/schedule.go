@@ -13,14 +13,14 @@ import (
 )
 
 type CudosCommand struct {
-	shutdown contract.ShutdownReady
-	cudos    cudoscontract.CudosWithdrawSender
+	shutdown       contract.ShutdownReady
+	withdrawSender cudoscontract.CudosWithdrawSender
 }
 
-func NewCudosCommand(shutdown contract.ShutdownReady, cudos cudoscontract.CudosWithdrawSender) *CudosCommand {
+func NewCudosCommand(shutdown contract.ShutdownReady, withdrawSender cudoscontract.CudosWithdrawSender) *CudosCommand {
 	cmd := CudosCommand{
-		shutdown: shutdown,
-		cudos:    cudos,
+		shutdown:       shutdown,
+		withdrawSender: withdrawSender,
 	}
 
 	return &cmd
@@ -48,7 +48,7 @@ func (cc CudosCommand) RunSchedule(ctx context.Context, out chan<- string, inter
 						return
 					}
 
-					withdrawRewardAmount, res, err := cc.cudos.Withdraw()
+					withdrawRewardAmount, res, err := cc.withdrawSender.Withdraw()
 					if checkErrWithChan(ctx, err, out) {
 						return
 					}
@@ -65,7 +65,7 @@ func (cc CudosCommand) RunSchedule(ctx context.Context, out chan<- string, inter
 					}
 
 					// send the withdrawn reward (caveat: tx fees + gas >> withdrawn reward which makes no financial sense)
-					sentAmount, res, err := cc.cudos.Send(withdrawRewardAmount)
+					sentAmount, res, err := cc.withdrawSender.Send(withdrawRewardAmount)
 					if checkErrWithChan(ctx, err, out) {
 						return
 					}

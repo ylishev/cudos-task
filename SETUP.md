@@ -38,7 +38,7 @@ docker run --rm --platform linux/arm64 -v $(pwd):/app -w /app golangci/golangci-
 
 ## Tool usage
 ```bash
-docker run -it --rm -v /Users/yuliyan/developers/workspace/cudos-node/cudos-data:/cudos-data \
+docker run -it --rm -v /Users/yuliyan/cudos-node/cudos-data:/cudos-data \
 --name cudos-task-container cudos-task withdraw-rewards --node https://rpc.testnet.cudos.org:443 \
 --keyring-dir /cudos-data --chain-id cudos-testnet-public-4 \
 --from test --to-address cudos1fefgllqh9qpjn3laz3lmhl68kvlfhwzmq6clfq \
@@ -52,9 +52,12 @@ with <b>--keyring-backend test</b>! The tool needs access to the keys, stored in
 
 For that reason the path to --keyring-dir <b>must</b> be provided and mounted via docker's <b>-v</b> option.
 In my case, keyring-dir is located inside cudos-node tool at:
-<i>/Users/yuliyan/developers/workspace/cudos-node/cudos-data</i> and it is exposed by <b>docker</b> as /cudos-data.
+<i>/Users/yuliyan/cudos-node/cudos-data</i> and it is exposed by <b>docker</b> as /cudos-data.
 That is the reason why <b>--keyring-dir</b> is pointing at <b>/cudos-data</b> location.
 </pre>
 
 Aside from the note above, **--from**, **--to-address** and **--interval** flags could be tweaked.
 **--interval** (duration syntax, i.e. 30s, 2m, etc.) is used to run the schedule.
+
+To stop the tool, Ctrl+C can be used. In case the tool is in the middle of execution of withdraw/send,
+the tool will terminate once the action is completed (or hits the timeout).

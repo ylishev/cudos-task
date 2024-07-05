@@ -37,7 +37,7 @@ func initConfig(cfgFile *string, vp *viper.Viper, rootCmd *cobra.Command) func()
 		if vp.GetString(flags.FlagKeyringDir) == "" {
 			pwd, err := os.Getwd()
 			if err == nil {
-				err = flagSet.Set("keyring-dir", pwd)
+				err = flagSet.Set(flags.FlagKeyringDir, pwd)
 				cobra.CheckErr(err)
 			}
 		}
