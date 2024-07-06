@@ -40,7 +40,9 @@ func (s *Shutdown) SetReady(ready bool) bool {
 	if ready {
 		if s.ready.CompareAndSwap(1, 0) {
 			if s.inProgress.CompareAndSwap(true, true) {
-				close(s.readyChan)
+				if s.ready.CompareAndSwap(0, 2) {
+					close(s.readyChan)
+				}
 			}
 			return true
 		}
